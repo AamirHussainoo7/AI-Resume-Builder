@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.full_name }} — Resume</title>
+    <style>
+        /* Classic Resume Template — Traditional single-column, serif fonts */
+        @page {
+            size: A4;
+            margin: 25mm 20mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #222;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #222;
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+        }
+
+        .header .contact-line {
+            font-size: 9pt;
+            color: #555;
+        }
+
+        .header .contact-line span {
+            margin: 0 8px;
+        }
+
+        .section {
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            font-size: 11pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #111;
+            border-bottom: 1px solid #999;
+            padding-bottom: 3px;
+            margin-bottom: 10px;
+        }
+
+        .summary-text {
+            font-size: 9.5pt;
+            color: #333;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .entry {
+            margin-bottom: 14px;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .entry-title {
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .entry-date {
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        .entry-subtitle {
+            font-size: 9.5pt;
+            color: #444;
+            font-style: italic;
+        }
+
+        .entry-description {
+            font-size: 9pt;
+            color: #444;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .skills-list {
+            font-size: 9.5pt;
+            color: #333;
+        }
+
+        .tech-stack {
+            font-size: 8.5pt;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .link {
+            color: #444;
+            text-decoration: underline;
+            font-size: 8.5pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ resume.full_name|default:"Your Name" }}</h1>
+        <div class="contact-line">
+            {% if resume.email %}<span>{{ resume.email }}</span>{% endif %}
+            {% if resume.phone %}<span>| {{ resume.phone }}</span>{% endif %}
+            {% if resume.location %}<span>| {{ resume.location }}</span>{% endif %}
+            {% if resume.linkedin %}<span>| {{ resume.linkedin }}</span>{% endif %}
+            {% if resume.website %}<span>| {{ resume.website }}</span>{% endif %}
+        </div>
+    </div>
+
+    {% if resume.summary %}
+    <div class="section">
+        <div class="section-title">Professional Summary</div>
+        <p class="summary-text">{{ resume.summary }}</p>
+    </div>
+    {% endif %}
+
+    {% if resume.experiences %}
+    <div class="section">
+        <div class="section-title">Professional Experience</div>
+        {% for exp in resume.experiences %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="entry-title">{{ exp.role }}</span>
+                <span class="entry-date">{{ exp.start_date }} — {{ exp.end_date|default:"Present" }}</span>
+            </div>
+            <div class="entry-subtitle">{{ exp.company_name }}</div>
+            {% if exp.description %}
+            <div class="entry-description">{{ exp.description }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if resume.educations %}
+    <div class="section">
+        <div class="section-title">Education</div>
+        {% for edu in resume.educations %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="entry-title">{{ edu.degree }}{% if edu.field_of_study %} in {{ edu.field_of_study }}{% endif %}</span>
+                <span class="entry-date">{{ edu.start_year }} — {{ edu.end_year|default:"Present" }}</span>
+            </div>
+            <div class="entry-subtitle">{{ edu.college_name }}{% if edu.cgpa %} | CGPA: {{ edu.cgpa }}{% endif %}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if resume.projects %}
+    <div class="section">
+        <div class="section-title">Projects</div>
+        {% for proj in resume.projects %}
+        <div class="entry">
+            <div class="entry-header">
+                <span class="entry-title">{{ proj.project_name }}</span>
+                {% if proj.github_link %}
+                <a href="{{ proj.github_link }}" class="link">GitHub</a>
+                {% endif %}
+            </div>
+            {% if proj.description %}
+            <div class="entry-description">{{ proj.description }}</div>
+            {% endif %}
+            {% if proj.tech_stack %}
+            <div class="tech-stack">Technologies: {{ proj.tech_stack|join:", " }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if resume.skills %}
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <p class="skills-list">{{ resume.skills|join:" • " }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>
