@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Eye, EyeOff, FileText, LogIn } from 'lucide-react';
+import { Eye, EyeOff, FileText, LogIn, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { login, clearError } from '../redux/authSlice';
 import FormInput from '../components/common/FormInput';
@@ -52,46 +52,126 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--bg-primary)' }}>
-      {/* Left: Decorative */}
+    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-primary)' }}>
+      {/* Left: Decorative Panel */}
       <div
-        className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden"
-        style={{ background: 'var(--gradient-hero)' }}
+        style={{
+          display: 'none',
+          width: '50%',
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'var(--gradient-hero)',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        className="lg-show"
       >
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(circle at 30% 50%, rgba(99,102,241,0.2), transparent 60%)',
-        }} />
-        <div className="relative z-10 text-center px-12">
-          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8"
-            style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
+        {/* Decorative orbs */}
+        <div
+          className="animate-orb"
+          style={{
+            position: 'absolute',
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
+            background: 'rgba(99, 102, 241, 0.15)',
+            filter: 'blur(80px)',
+            top: '10%',
+            left: '20%',
+          }}
+        />
+        <div
+          className="animate-orb"
+          style={{
+            position: 'absolute',
+            width: '250px',
+            height: '250px',
+            borderRadius: '50%',
+            background: 'rgba(139, 92, 246, 0.12)',
+            filter: 'blur(60px)',
+            bottom: '20%',
+            right: '10%',
+            animationDelay: '2s',
+          }}
+        />
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 48px' }}>
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '20px',
+              background: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 32px',
+            }}
+          >
             <FileText size={40} color="white" />
           </div>
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 style={{ fontSize: '36px', fontWeight: 700, color: 'white', marginBottom: '16px', letterSpacing: '-1px' }}>
             Welcome Back
           </h2>
-          <p className="text-lg text-white/60 max-w-md">
+          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.5)', maxWidth: '380px', margin: '0 auto', lineHeight: 1.6 }}>
             Continue building your professional resume with AI-powered tools.
           </p>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '40px' }}>
+            {[Sparkles, FileText, LogIn].map((Icon, i) => (
+              <div
+                key={i}
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon size={18} color="rgba(255,255,255,0.4)" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Right: Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md animate-fade-in-up">
-          <div className="mb-8">
-            <Link to="/" className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: 'var(--gradient-primary)' }}>
-                <FileText size={18} color="white" />
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '32px',
+        }}
+        className="login-form-side"
+      >
+        <div className="animate-fade-in-up" style={{ width: '100%', maxWidth: '420px' }}>
+          <div style={{ marginBottom: '36px' }}>
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '28px', textDecoration: 'none' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'var(--gradient-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <FileText size={16} color="white" />
               </div>
-              <span className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+              <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {APP_NAME}
               </span>
             </Link>
-            <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
               Sign in to your account
             </h1>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
               Don't have an account?{' '}
               <Link to="/signup" style={{ color: 'var(--primary-500)', fontWeight: 500 }}>
                 Create one free
@@ -99,7 +179,7 @@ export default function Login() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-1" id="login-form">
+          <form onSubmit={handleSubmit} id="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <FormInput
               label="Email"
               id="email"
@@ -111,7 +191,7 @@ export default function Login() {
               required
             />
 
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
               <FormInput
                 label="Password"
                 id="password"
@@ -125,8 +205,15 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 btn-ghost p-1 rounded"
-                style={{ color: 'var(--text-tertiary)' }}
+                className="btn-ghost"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '36px',
+                  padding: '4px',
+                  borderRadius: '6px',
+                  color: 'var(--text-tertiary)',
+                }}
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -135,8 +222,15 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary w-full py-3 mt-4"
+              className="btn btn-primary"
               id="login-submit"
+              style={{
+                width: '100%',
+                padding: '13px',
+                marginTop: '8px',
+                fontSize: '15px',
+                borderRadius: '12px',
+              }}
             >
               {isLoading ? (
                 <div className="spinner" style={{ borderTopColor: 'white' }} />
@@ -149,6 +243,13 @@ export default function Login() {
           </form>
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 1024px) {
+          .lg-show { display: flex !important; }
+          .login-form-side { width: 50% !important; }
+        }
+      `}</style>
     </div>
   );
 }
