@@ -7,8 +7,25 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+
+def health_check(request):
+    """Quick health-check that also reports the active DB engine."""
+    db_engine = settings.DATABASES['default']['ENGINE']
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    return JsonResponse({
+        'status': 'ok',
+        'database_engine': db_engine,
+        'user_count': User.objects.count(),
+    })
+
 
 urlpatterns = [
+    # Health check (public, no auth required)
+    path('api/health/', health_check, name='health-check'),
+
     # Admin panel
     path('admin/', admin.site.urls),
 
@@ -22,3 +39,4 @@ urlpatterns = [
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
