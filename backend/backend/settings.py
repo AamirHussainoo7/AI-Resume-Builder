@@ -14,8 +14,25 @@ from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+def env_bool(name, default=False):
+    """
+    Parse boolean-like environment values more defensively than decouple's
+    built-in bool cast so unrelated values like "release" do not crash startup.
+    """
+    value = config(name, default=default)
+    if isinstance(value, bool):
+        return value
+
+    normalized = str(value).strip().lower()
+    if normalized in {'1', 'true', 't', 'yes', 'y', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'f', 'no', 'n', 'off', 'release', 'prod', 'production'}:
+        return False
+
+    return default
+
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = env_bool('DEBUG', default=True)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 # =============================================================================
@@ -78,38 +95,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # =============================================================================
-# DATABASE — PostgreSQL (primary) / SQLite (fallback for development)
+# DATABASE — PostgreSQL
 # =============================================================================
 
-# Try PostgreSQL first; fall back to SQLite if unavailable
-_db_engine = config('DB_ENGINE', default='auto')
+import dj_database_url
 
-if _db_engine == 'sqlite':
-    _use_sqlite = True
-elif _db_engine == 'postgresql':
-    _use_sqlite = False
-else:
-    # Auto-detect: try connecting to PostgreSQL
-    try:
-        import psycopg2
-        conn = psycopg2.connect(
-            dbname=config('DB_NAME', default='resumebuilder_db'),
-            user=config('DB_USER', default='postgres'),
-            password=config('DB_PASSWORD', default='postgres'),
-            host=config('DB_HOST', default='localhost'),
-            port=config('DB_PORT', default='5432'),
-        )
-        conn.close()
-        _use_sqlite = False
-    except Exception:
-        _use_sqlite = True
+# Prefer DATABASE_URL if set (e.g. on Render / Heroku); otherwise build from
+# individual DB_* environment variables.
+_database_url = config('DATABASE_URL', default='')
 
-if _use_sqlite:
+if _database_url:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        'default': dj_database_url.parse(
+            _database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
     DATABASES = {

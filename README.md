@@ -175,6 +175,29 @@ npm run dev
 
 The frontend runs at **http://localhost:5173** and proxies API requests to **http://localhost:8000**.
 
+### Quick Local Start (Windows PowerShell)
+
+This repo now includes a helper script that opens both services with local defaults:
+
+```powershell
+.\start-local.ps1
+```
+
+Local development is configured to:
+- use `SQLite` by default in `backend/.env`
+- call `http://localhost:8000/api` from the frontend
+- fall back to mock AI responses unless you add a real `OPENAI_API_KEY`
+- use `backend\venv` when available, otherwise fall back to `python` or `py`
+
+If the checked-in virtual environment is stale on your machine, recreate it:
+
+```powershell
+cd backend
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
 ---
 
 ## ⚙️ Environment Variables
