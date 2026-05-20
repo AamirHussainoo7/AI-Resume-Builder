@@ -71,13 +71,8 @@ class LoginSerializer(serializers.Serializer):
         if not email or not password:
             raise serializers.ValidationError('Both email and password are required.')
 
-        # Find user by email, authenticate with username
-        try:
-            user = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('Invalid email or password.')
-
-        user = authenticate(username=user.username, password=password)
+        # USERNAME_FIELD is 'email', so authenticate() must use email= keyword
+        user = authenticate(email=email, password=password)
         if user is None:
             raise serializers.ValidationError('Invalid email or password.')
 
