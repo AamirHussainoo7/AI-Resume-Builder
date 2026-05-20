@@ -15,8 +15,20 @@ def health_check(request):
     db_engine = settings.DATABASES['default']['ENGINE']
     from django.contrib.auth import get_user_model
     User = get_user_model()
+
+    # Read git commit if available
+    import subprocess
+    try:
+        commit = subprocess.check_output(
+            ['git', 'rev-parse', '--short', 'HEAD'],
+            stderr=subprocess.DEVNULL
+        ).decode().strip()
+    except Exception:
+        commit = 'unknown'
+
     return JsonResponse({
         'status': 'ok',
+        'version': commit,
         'database_engine': db_engine,
         'user_count': User.objects.count(),
     })
