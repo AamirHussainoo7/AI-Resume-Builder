@@ -2,13 +2,14 @@
  * Sidebar — Collapsible navigation sidebar with active state.
  */
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FilePlus,
   User,
   X,
   Sparkles,
+  Zap,
 } from 'lucide-react';
 
 const navItems = [
@@ -18,13 +19,19 @@ const navItems = [
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
+  const location = useLocation();
+
   return (
     <>
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 md:hidden"
           onClick={onClose}
+          style={{
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+          }}
         />
       )}
 
@@ -42,60 +49,143 @@ export default function Sidebar({ isOpen, onClose }) {
       >
         {/* Mobile close button */}
         <div className="flex items-center justify-end px-4 py-2 md:hidden">
-          <button onClick={onClose} className="btn-ghost p-2 rounded-lg">
-            <X size={20} style={{ color: 'var(--text-secondary)' }} />
+          <button
+            onClick={onClose}
+            className="btn-ghost p-2 rounded-lg"
+            style={{
+              color: 'var(--text-secondary)',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <X size={20} />
           </button>
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive ? 'sidebar-active' : 'sidebar-inactive'
-                }`
-              }
-              style={({ isActive }) => ({
-                background: isActive ? 'var(--primary-50)' : 'transparent',
-                color: isActive ? 'var(--primary-600)' : 'var(--text-secondary)',
-              })}
-              onMouseEnter={(e) => {
-                if (!e.currentTarget.classList.contains('sidebar-active')) {
-                  e.currentTarget.style.background = 'var(--bg-tertiary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!e.currentTarget.classList.contains('sidebar-active')) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              <item.icon size={18} />
-              {item.label}
-            </NavLink>
-          ))}
+        <nav className="flex-1 px-3 py-6" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={onClose}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '11px 16px',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: isActive ? '600' : '500',
+                  textDecoration: 'none',
+                  position: 'relative',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  background: isActive
+                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%)'
+                    : 'transparent',
+                  color: isActive ? 'var(--primary-500)' : 'var(--text-secondary)',
+                  border: isActive ? '1px solid rgba(99, 102, 241, 0.15)' : '1px solid transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }
+                }}
+              >
+                {isActive && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '-13px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '3px',
+                      height: '24px',
+                      borderRadius: '0 4px 4px 0',
+                      background: 'var(--gradient-primary)',
+                    }}
+                  />
+                )}
+                <item.icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                {item.label}
+              </NavLink>
+            );
+          })}
         </nav>
 
-        {/* Bottom section */}
-        <div className="px-4 pb-6">
+        {/* Bottom section — AI promo card */}
+        <div className="px-4 pb-5">
           <div
-            className="p-4 rounded-xl"
             style={{
+              position: 'relative',
+              overflow: 'hidden',
+              padding: '20px 16px',
+              borderRadius: '16px',
               background: 'var(--gradient-primary)',
               color: 'white',
+              boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)',
             }}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={18} />
-              <span className="font-semibold text-sm">AI Powered</span>
+            {/* Decorative circles */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.1)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-10px',
+                left: '-10px',
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.08)',
+              }}
+            />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '8px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '8px',
+                    background: 'rgba(255,255,255,0.2)',
+                  }}
+                >
+                  <Zap size={14} />
+                </div>
+                <span style={{ fontWeight: 700, fontSize: '14px', letterSpacing: '-0.01em' }}>AI Powered</span>
+              </div>
+              <p style={{ fontSize: '12px', opacity: 0.85, lineHeight: '1.5' }}>
+                Improve your resume with AI suggestions, ATS scoring, and smart summaries.
+              </p>
             </div>
-            <p className="text-xs opacity-80 leading-relaxed">
-              Improve your resume with AI-powered suggestions, ATS scoring, and smart summaries.
-            </p>
           </div>
         </div>
       </aside>

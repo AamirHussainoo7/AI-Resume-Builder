@@ -41,8 +41,8 @@ export default function Navbar({ onToggleSidebar }) {
       style={{
         height: 'var(--navbar-height)',
         background: 'var(--bg-glass)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid var(--border-default)',
       }}
     >
@@ -53,22 +53,40 @@ export default function Navbar({ onToggleSidebar }) {
             onClick={onToggleSidebar}
             className="btn-ghost p-2 rounded-lg md:hidden"
             id="sidebar-toggle"
+            style={{ color: 'var(--text-secondary)' }}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         )}
-        <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2">
+        <Link
+          to={isAuthenticated ? '/dashboard' : '/'}
+          className="flex items-center gap-2.5"
+          style={{ textDecoration: 'none' }}
+        >
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'var(--gradient-primary)' }}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--gradient-primary)',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
+            }}
           >
             <FileText size={18} color="white" />
           </div>
           <span
-            className="text-lg font-bold hidden sm:block"
-            style={{ color: 'var(--text-primary)' }}
+            className="hidden sm:block"
+            style={{
+              fontSize: '18px',
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.03em',
+            }}
           >
             {APP_NAME}
           </span>
@@ -80,10 +98,29 @@ export default function Navbar({ onToggleSidebar }) {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="btn-ghost p-2 rounded-lg"
           id="theme-toggle"
           title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          style={{ color: 'var(--text-secondary)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '38px',
+            height: '38px',
+            borderRadius: '12px',
+            background: 'transparent',
+            border: '1px solid transparent',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--bg-tertiary)';
+            e.currentTarget.style.borderColor = 'var(--border-default)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.borderColor = 'transparent';
+          }}
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
@@ -93,21 +130,53 @@ export default function Navbar({ onToggleSidebar }) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 btn-ghost px-3 py-2 rounded-lg"
               id="user-menu"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '5px 12px 5px 5px',
+                borderRadius: '14px',
+                background: 'transparent',
+                border: '1px solid transparent',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--bg-tertiary)';
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+              }}
+              onMouseLeave={(e) => {
+                if (!dropdownOpen) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }
+              }}
             >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
                 style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '13px',
+                  fontWeight: 700,
                   background: 'var(--gradient-primary)',
                   color: 'white',
+                  letterSpacing: '0.02em',
                 }}
               >
                 {getInitials(user.name || user.username)}
               </div>
               <span
-                className="text-sm font-medium hidden sm:block"
-                style={{ color: 'var(--text-primary)' }}
+                className="hidden sm:block"
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}
               >
                 {user.name || user.username}
               </span>
@@ -123,32 +192,72 @@ export default function Navbar({ onToggleSidebar }) {
 
             {dropdownOpen && (
               <div
-                className="absolute right-0 mt-2 w-48 py-1 animate-fade-in-down"
+                className="absolute right-0 mt-2 animate-fade-in-down"
                 style={{
+                  width: '200px',
+                  padding: '6px',
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--border-default)',
-                  borderRadius: 'var(--radius-lg)',
+                  borderRadius: '16px',
                   boxShadow: 'var(--shadow-lg)',
                 }}
               >
                 <Link
                   to="/profile"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
-                  style={{ color: 'var(--text-secondary)' }}
-                  onMouseEnter={(e) => e.target.style.background = 'var(--bg-tertiary)'}
-                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    borderRadius: '10px',
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
                 >
                   <User size={16} />
                   Profile
                 </Link>
-                <div style={{ borderTop: '1px solid var(--border-default)', margin: '4px 0' }} />
+                <div style={{
+                  height: '1px',
+                  background: 'var(--border-default)',
+                  margin: '4px 8px',
+                }} />
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm w-full text-left transition-colors"
-                  style={{ color: 'var(--error)' }}
-                  onMouseEnter={(e) => e.target.style.background = 'var(--bg-tertiary)'}
-                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    borderRadius: '10px',
+                    width: '100%',
+                    textAlign: 'left',
+                    color: 'var(--error)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.06)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
                 >
                   <LogOut size={16} />
                   Logout
