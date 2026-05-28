@@ -1,34 +1,66 @@
 /**
  * PDF service — Handles PDF generation and download.
+ * Handles export limit errors and premium template restrictions.
  */
 
 import api from './api';
 
 const pdfService = {
   generatePDF: async (resumeId, templateName = 'modern') => {
-    const response = await api.post(
-      '/pdf/generate/',
-      { resume_id: resumeId, template_name: templateName },
-      { responseType: 'blob' }
-    );
+    try {
+      const response = await api.post(
+        '/pdf/generate/',
+        { resume_id: resumeId, template_name: templateName },
+        { responseType: 'blob' }
+      );
 
-    // Create download link
-    const blob = new Blob([response.data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
+      // Check if the response is an error JSON disguised as a blob
+      const contentType = response.headers['content-type'];
+      if (contentType && contentType.includes('application/json')) {
+        // Parse the blob as text to read the error
+        const text = await response.data.text();
+        const errorData = JSON.parse(text);
+        throw { response: { data: errorData, status: 403 } };
+      }
 
-    // Extract filename from Content-Disposition header or use default
-    const contentDisposition = response.headers['content-disposition'];
-    const filename = contentDisposition
-      ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
-      : 'resume.pdf';
+      // Create download link
+      const blob = new Blob([response.data], { type: contentType || 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
 
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+      // Extract filename from Content-Disposition header or use default
+      const contentDisposition = response.headers['content-disposition'];
+      const filename = contentDisposition
+        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
+        : 'resume.pdf';
+
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      return { success: true };
+    } catch (error) {
+      // Handle blob error responses (axios doesn't auto-parse blob errors)
+      if (error.response && error.response.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const errorData = JSON.parse(text);
+          throw {
+            response: {
+              data: errorData,
+              status: error.response.status,
+            },
+          };
+        } catch (parseError) {
+          if (parseError.response) throw parseError;
+          throw error;
+        }
+      }
+      throw error;
+    }
   },
 
   /** Client-side PDF generation using html2pdf.js */

@@ -1,11 +1,11 @@
 /**
- * Navbar — Top navigation bar with theme toggle and user dropdown.
+ * Navbar — Top navigation bar with theme toggle, premium badge, and user dropdown.
  */
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Sun, Moon, User, LogOut, ChevronDown, FileText } from 'lucide-react';
+import { Sun, Moon, User, LogOut, ChevronDown, FileText, Crown, Shield } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { logout } from '../../redux/authSlice';
 import { APP_NAME } from '../../utils/constants';
@@ -14,10 +14,14 @@ import { getInitials } from '../../utils/helpers';
 export default function Navbar({ onToggleSidebar }) {
   const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { status: subStatus } = useSelector((state) => state.subscription);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const isPremium = subStatus?.is_premium || user?.is_premium;
+  const isAdmin = user?.is_staff;
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -95,6 +99,28 @@ export default function Navbar({ onToggleSidebar }) {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {/* Premium Badge */}
+        {isAuthenticated && isPremium && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '5px 12px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(234, 179, 8, 0.06))',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#f59e0b',
+              letterSpacing: '0.5px',
+            }}
+          >
+            <Crown size={12} />
+            PRO
+          </div>
+        )}
+
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
@@ -163,7 +189,9 @@ export default function Navbar({ onToggleSidebar }) {
                   justifyContent: 'center',
                   fontSize: '13px',
                   fontWeight: 700,
-                  background: 'var(--gradient-primary)',
+                  background: isAdmin
+                    ? 'linear-gradient(135deg, #f59e0b, #ef4444)'
+                    : 'var(--gradient-primary)',
                   color: 'white',
                   letterSpacing: '0.02em',
                 }}
@@ -194,7 +222,7 @@ export default function Navbar({ onToggleSidebar }) {
               <div
                 className="absolute right-0 mt-2 animate-fade-in-down"
                 style={{
-                  width: '200px',
+                  width: '220px',
                   padding: '6px',
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--border-default)',
@@ -229,6 +257,65 @@ export default function Navbar({ onToggleSidebar }) {
                   <User size={16} />
                   Profile
                 </Link>
+
+                {/* Upgrade link for non-premium, non-admin users */}
+                {!isPremium && !isAdmin && (
+                  <Link
+                    to="/upgrade"
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 14px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      borderRadius: '10px',
+                      color: '#f59e0b',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(245, 158, 11, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <Crown size={16} />
+                    Upgrade to Premium
+                  </Link>
+                )}
+
+                {/* Admin Portal link */}
+                {isAdmin && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setDropdownOpen(false)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 14px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      borderRadius: '10px',
+                      color: '#6366f1',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(99, 102, 241, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <Shield size={16} />
+                    Admin Portal
+                  </Link>
+                )}
+
                 <div style={{
                   height: '1px',
                   background: 'var(--border-default)',

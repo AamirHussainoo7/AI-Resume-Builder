@@ -10,18 +10,35 @@ export const RESUME_TEMPLATES = [
     name: 'Modern',
     description: 'Clean two-column layout with colored sidebar',
     color: '#6366f1',
+    isPremium: false,
   },
   {
     id: 'classic',
     name: 'Classic',
     description: 'Traditional single-column with serif fonts',
     color: '#1a1a2e',
+    isPremium: false,
   },
   {
     id: 'minimal',
     name: 'Minimal',
     description: 'Ultra-clean, whitespace-heavy design',
     color: '#64748b',
+    isPremium: false,
+  },
+  {
+    id: 'executive',
+    name: 'Executive',
+    description: 'Elegant dark sidebar with blue accents',
+    color: '#1a202c',
+    isPremium: true,
+  },
+  {
+    id: 'creative',
+    name: 'Creative',
+    description: 'Bold gradient header with timeline layout',
+    color: '#8b5cf6',
+    isPremium: true,
   },
 ];
 

@@ -46,6 +46,8 @@ urlpatterns = [
     path('api/resumes/', include('resumes.urls')),
     path('api/ai/', include('ai.urls')),
     path('api/pdf/', include('pdf_generator.urls')),
+    path('api/subscriptions/', include('subscriptions.urls')),
+    path('api/admin-portal/', include('subscriptions.admin_urls')),
 ]
 
 # Serve media files in development

@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'resumes.apps.ResumesConfig',
     'ai.apps.AiConfig',
     'pdf_generator.apps.PdfGeneratorConfig',
+    'subscriptions.apps.SubscriptionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -155,8 +156,10 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '30/minute',
-        'user': '100/minute',
+        'anon': '20/minute',
+        'user': '60/minute',
+        'payment': '5/minute',
+        'admin': '120/minute',
     },
 }
 
@@ -234,3 +237,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # =============================================================================
 
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='sk-mock-key')
+
+# =============================================================================
+# SUBSCRIPTION CONFIGURATION
+# =============================================================================
+
+FREE_EXPORT_LIMIT = config('FREE_EXPORT_LIMIT', default=3, cast=int)
+PREMIUM_PRICE_INR = 99
+PREMIUM_DURATION_DAYS = 30
+UPI_ID = config('UPI_ID', default='9399265348@ibl')

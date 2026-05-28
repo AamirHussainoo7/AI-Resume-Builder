@@ -1,18 +1,18 @@
 /**
- * Redux store configuration.
- * Combines auth and resume slices for global state management.
+ * Redux store — Combines all reducers.
  */
 
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
 import resumeReducer from './resumeSlice';
+import subscriptionReducer from './subscriptionSlice';
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     auth: authReducer,
     resume: resumeReducer,
+    subscription: subscriptionReducer,
   },
-  devTools: import.meta.env.DEV,
 });
 
 export default store;

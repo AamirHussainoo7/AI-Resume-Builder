@@ -18,6 +18,8 @@ class Resume(models.Model):
         ('modern', 'Modern'),
         ('classic', 'Classic'),
         ('minimal', 'Minimal'),
+        ('executive', 'Executive ★'),
+        ('creative', 'Creative ★'),
     ]
 
     user = models.ForeignKey(

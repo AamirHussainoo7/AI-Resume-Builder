@@ -29,12 +29,19 @@ export default function ResumePreview() {
   useEffect(() => { dispatch(fetchResumeById(id)); }, [id, dispatch]);
 
   const handleDownload = async () => {
-    if (!previewRef.current) return;
+    if (!currentResume) return;
     toast.loading('Generating PDF...', { id: 'pdf' });
     try {
-      await pdfService.generateClientPDF(previewRef.current, `${currentResume?.title || 'resume'}.pdf`);
+      // Use server-side generation which tracks exports and enforces limits
+      await pdfService.generatePDF(currentResume.id, currentResume.template_name);
       toast.success('PDF downloaded!', { id: 'pdf' });
-    } catch { toast.error('Download failed', { id: 'pdf' }); }
+      // Refresh subscription status to update export counter
+      const { fetchSubscriptionStatus } = await import('../redux/subscriptionSlice');
+      dispatch(fetchSubscriptionStatus());
+    } catch (err) {
+      const errorMsg = err?.response?.data?.error || 'Download failed';
+      toast.error(errorMsg, { id: 'pdf' });
+    }
   };
 
   const handleATSScore = async () => {

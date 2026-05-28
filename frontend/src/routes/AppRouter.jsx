@@ -6,6 +6,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoute from './AdminRoute';
 import Loader from '../components/common/Loader';
 
 // Lazy-loaded pages
@@ -16,6 +17,13 @@ const Dashboard = lazy(() => import('../pages/Dashboard'));
 const ResumeBuilder = lazy(() => import('../pages/ResumeBuilder'));
 const ResumePreview = lazy(() => import('../pages/ResumePreview'));
 const Profile = lazy(() => import('../pages/Profile'));
+const Upgrade = lazy(() => import('../pages/Upgrade'));
+
+// Admin pages
+const AdminLogin = lazy(() => import('../pages/admin/AdminLogin'));
+const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
+const PaymentRequests = lazy(() => import('../pages/admin/PaymentRequests'));
+const UserManagement = lazy(() => import('../pages/admin/UserManagement'));
 
 export default function AppRouter() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -76,6 +84,41 @@ export default function AppRouter() {
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/upgrade"
+          element={
+            <ProtectedRoute>
+              <Upgrade />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/payments"
+          element={
+            <AdminRoute>
+              <PaymentRequests />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <UserManagement />
+            </AdminRoute>
           }
         />
 

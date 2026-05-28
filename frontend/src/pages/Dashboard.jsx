@@ -1,11 +1,15 @@
 /**
  * Dashboard — Shows user's resumes with create, edit, delete actions.
+ * Includes subscription status card and export tracking.
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Plus, Search, FileText, Sparkles, LayoutGrid, TrendingUp } from 'lucide-react';
+import {
+  Plus, Search, FileText, Sparkles, LayoutGrid, TrendingUp,
+  Crown, Zap, Download, Clock,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../components/common/Navbar';
 import Sidebar from '../components/common/Sidebar';
@@ -13,6 +17,7 @@ import ResumeCard from '../components/resume/ResumeCard';
 import Modal from '../components/common/Modal';
 import Loader from '../components/common/Loader';
 import { fetchResumes, deleteResume } from '../redux/resumeSlice';
+import { fetchSubscriptionStatus, fetchExportHistory } from '../redux/subscriptionSlice';
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -22,8 +27,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { resumes, isLoading } = useSelector((s) => s.resume);
   const { user } = useSelector((s) => s.auth);
+  const { status: subStatus, exportHistory } = useSelector((s) => s.subscription);
 
-  useEffect(() => { dispatch(fetchResumes()); }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchResumes());
+    dispatch(fetchSubscriptionStatus());
+    dispatch(fetchExportHistory());
+  }, [dispatch]);
 
   const filtered = resumes.filter((r) =>
     r.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -83,15 +93,103 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Quick stats strip */}
-        {resumes.length > 0 && (
+        {/* Subscription Status + Quick Stats */}
+        <div className="animate-fade-in-up" style={{
+          display: 'flex', gap: '16px', marginBottom: '28px',
+          animationDelay: '0.05s', flexWrap: 'wrap',
+        }}>
+          {/* Subscription Card */}
+          <div
+            onClick={() => !subStatus?.is_premium && navigate('/upgrade')}
+            style={{
+              flex: '1 1 200px', maxWidth: '300px', display: 'flex', alignItems: 'center', gap: '14px',
+              padding: '16px 20px', borderRadius: '16px', cursor: subStatus?.is_premium ? 'default' : 'pointer',
+              background: subStatus?.is_premium
+                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(234, 179, 8, 0.04))'
+                : 'var(--bg-secondary)',
+              border: subStatus?.is_premium
+                ? '1px solid rgba(245, 158, 11, 0.2)'
+                : '1px solid var(--border-default)',
+              transition: 'all 0.25s ease',
+            }}
+          >
+            <div style={{
+              width: '42px', height: '42px', borderRadius: '12px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: subStatus?.is_premium ? 'rgba(245, 158, 11, 0.15)' : 'rgba(99, 102, 241, 0.12)',
+              color: subStatus?.is_premium ? '#f59e0b' : '#6366f1',
+            }}>
+              {subStatus?.is_premium ? <Crown size={20} /> : <Zap size={20} />}
+            </div>
+            <div>
+              <div style={{
+                fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)',
+                display: 'flex', alignItems: 'center', gap: '6px',
+              }}>
+                {subStatus?.is_premium ? 'Premium' : 'Free Plan'}
+                {subStatus?.is_premium && (
+                  <span style={{
+                    fontSize: '10px', padding: '2px 8px', borderRadius: '20px',
+                    background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b',
+                    fontWeight: 700,
+                  }}>ACTIVE</span>
+                )}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                {subStatus?.is_premium
+                  ? `${subStatus.days_remaining} days remaining`
+                  : 'Upgrade for unlimited exports'
+                }
+              </div>
+            </div>
+          </div>
+
+          {/* Export Counter */}
+          <QuickStat
+            label="Exports Used"
+            value={subStatus?.is_premium ? '∞' : `${subStatus?.free_exports_used || 0}/${subStatus?.free_exports_limit || 3}`}
+            color="#10b981"
+            icon={Download}
+            isText={subStatus?.is_premium}
+          />
+
+          {/* Resumes Count */}
+          <QuickStat label="Total Resumes" value={resumes.length} color="#6366f1" icon={FileText} />
+
+          {/* Templates Used */}
+          <QuickStat
+            label="Templates Used"
+            value={new Set(resumes.map(r => r.template_name)).size}
+            color="#8b5cf6"
+            icon={LayoutGrid}
+          />
+        </div>
+
+        {/* Upgrade Banner for free users */}
+        {subStatus && !subStatus.is_premium && subStatus.free_exports_remaining <= 1 && (
           <div className="animate-fade-in-up" style={{
-            display: 'flex', gap: '16px', marginBottom: '28px',
-            animationDelay: '0.05s', flexWrap: 'wrap',
+            padding: '18px 24px', borderRadius: '16px', marginBottom: '24px',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05))',
+            border: '1px solid rgba(99, 102, 241, 0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: '12px',
           }}>
-            <QuickStat label="Total Resumes" value={resumes.length} color="#6366f1" icon={FileText} />
-            <QuickStat label="Templates Used" value={new Set(resumes.map(r => r.template_name)).size} color="#10b981" icon={LayoutGrid} />
-            <QuickStat label="Last Updated" value={resumes[0] ? formatRelative(resumes[0].updated_at) : '—'} color="#f59e0b" icon={TrendingUp} isText />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} style={{ color: '#6366f1' }} />
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                {subStatus.free_exports_remaining === 0
+                  ? 'You\'ve used all free exports this month!'
+                  : 'Only 1 free export remaining this month!'
+                }
+              </span>
+            </div>
+            <button
+              onClick={() => navigate('/upgrade')}
+              className="btn btn-primary"
+              style={{ padding: '8px 20px', fontSize: '13px', fontWeight: 600, borderRadius: '10px', gap: '6px' }}
+            >
+              <Crown size={14} /> Upgrade to Premium
+            </button>
           </div>
         )}
 
@@ -184,6 +282,46 @@ export default function Dashboard() {
             ))}
           </div>
         )}
+
+        {/* Export History */}
+        {exportHistory && exportHistory.length > 0 && (
+          <div style={{ marginTop: '40px' }}>
+            <h3 style={{
+              fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)',
+              marginBottom: '16px', letterSpacing: '-0.02em',
+              display: 'flex', alignItems: 'center', gap: '8px',
+            }}>
+              <Clock size={16} /> Recent Exports
+            </h3>
+            <div style={{
+              borderRadius: '16px', overflow: 'hidden',
+              border: '1px solid var(--border-default)',
+            }}>
+              {exportHistory.slice(0, 5).map((exp, i) => (
+                <div key={exp.id} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '12px 20px', background: 'var(--bg-secondary)',
+                  borderBottom: i < Math.min(exportHistory.length, 5) - 1 ? '1px solid var(--border-default)' : 'none',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <FileText size={15} style={{ color: 'var(--text-tertiary)' }} />
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {exp.resume_title}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                        {exp.template_name} template · {new Date(exp.exported_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  {exp.is_premium_export && (
+                    <Crown size={13} style={{ color: '#f59e0b' }} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Delete Modal */}
@@ -248,16 +386,4 @@ function QuickStat({ label, value, color, icon: Icon, isText }) {
       </div>
     </div>
   );
-}
-
-function formatRelative(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  const now = new Date();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60) return 'Just now';
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }

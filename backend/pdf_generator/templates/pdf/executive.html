@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.full_name }} — Resume</title>
+    <style>
+        /* Executive Resume Template — Premium two-column layout with elegant sidebar */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.55;
+            color: #2d3748;
+            background: #ffffff;
+        }
+
+        .resume-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar — Left panel */
+        .sidebar {
+            width: 33%;
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 40px 24px 30px;
+        }
+
+        .sidebar .name {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.15;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar .title-label {
+            font-size: 8.5pt;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: #63b3ed;
+            margin-bottom: 28px;
+            font-weight: 600;
+        }
+
+        .sidebar .section-title {
+            font-size: 7.5pt;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #63b3ed;
+            margin-top: 24px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(99, 179, 237, 0.2);
+            font-weight: 700;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 8.5pt;
+            margin-bottom: 8px;
+            color: #cbd5e0;
+            line-height: 1.4;
+        }
+
+        .contact-item .icon {
+            color: #63b3ed;
+            font-size: 9pt;
+            min-width: 14px;
+            text-align: center;
+            margin-top: 1px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: rgba(99, 179, 237, 0.12);
+            color: #90cdf4;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 7.5pt;
+            margin: 2px 3px 2px 0;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .edu-block {
+            margin-bottom: 14px;
+        }
+
+        .edu-degree {
+            font-weight: 600;
+            color: #fff;
+            font-size: 9pt;
+        }
+
+        .edu-field {
+            font-size: 8pt;
+            color: #90cdf4;
+        }
+
+        .edu-school {
+            font-size: 8pt;
+            color: #a0aec0;
+        }
+
+        .edu-meta {
+            font-size: 7.5pt;
+            color: #718096;
+        }
+
+        /* Main Content — Right panel */
+        .main-content {
+            width: 67%;
+            padding: 40px 32px 30px 28px;
+        }
+
+        .main-content .section-title {
+            font-size: 10pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #1a202c;
+            margin-top: 24px;
+            margin-bottom: 14px;
+            padding-bottom: 7px;
+            border-bottom: 2px solid #63b3ed;
+            position: relative;
+        }
+
+        .main-content .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .summary-text {
+            font-size: 9pt;
+            color: #4a5568;
+            line-height: 1.65;
+            padding-left: 12px;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .entry {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .entry-title {
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .entry-date {
+            font-size: 8pt;
+            color: #63b3ed;
+            font-weight: 600;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .entry-subtitle {
+            font-size: 9pt;
+            color: #4a5568;
+            font-weight: 500;
+            margin-top: 1px;
+        }
+
+        .entry-description {
+            font-size: 8.5pt;
+            color: #4a5568;
+            margin-top: 5px;
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            margin-top: 5px;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            background: #edf2f7;
+            color: #2b6cb0;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 7pt;
+            margin-right: 4px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .link {
+            color: #63b3ed;
+            text-decoration: none;
+            font-size: 7.5pt;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="name">{{ resume.full_name|default:"Your Name" }}</div>
+            <div class="title-label">Professional Resume</div>
+
+            <div class="section-title">Contact</div>
+            {% if resume.email %}
+            <div class="contact-item">
+                <span class="icon">✉</span>
+                <span>{{ resume.email }}</span>
+            </div>
+            {% endif %}
+            {% if resume.phone %}
+            <div class="contact-item">
+                <span class="icon">☎</span>
+                <span>{{ resume.phone }}</span>
+            </div>
+            {% endif %}
+            {% if resume.location %}
+            <div class="contact-item">
+                <span class="icon">⊕</span>
+                <span>{{ resume.location }}</span>
+            </div>
+            {% endif %}
+            {% if resume.linkedin %}
+            <div class="contact-item">
+                <span class="icon">⊡</span>
+                <span>{{ resume.linkedin }}</span>
+            </div>
+            {% endif %}
+            {% if resume.website %}
+            <div class="contact-item">
+                <span class="icon">◎</span>
+                <span>{{ resume.website }}</span>
+            </div>
+            {% endif %}
+
+            {% if resume.skills %}
+            <div class="section-title">Core Skills</div>
+            <div>
+                {% for skill in resume.skills %}
+                <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if resume.educations %}
+            <div class="section-title">Education</div>
+            {% for edu in resume.educations %}
+            <div class="edu-block">
+                <div class="edu-degree">{{ edu.degree }}</div>
+                {% if edu.field_of_study %}
+                <div class="edu-field">{{ edu.field_of_study }}</div>
+                {% endif %}
+                <div class="edu-school">{{ edu.college_name }}</div>
+                <div class="edu-meta">
+                    {{ edu.start_year }} — {{ edu.end_year|default:"Present" }}
+                    {% if edu.cgpa %} · CGPA: {{ edu.cgpa }}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            {% if resume.summary %}
+            <div class="section-title">Executive Summary</div>
+            <p class="summary-text">{{ resume.summary }}</p>
+            {% endif %}
+
+            {% if resume.experiences %}
+            <div class="section-title">Professional Experience</div>
+            {% for exp in resume.experiences %}
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">{{ exp.role }}</span>
+                    <span class="entry-date">{{ exp.start_date }} — {{ exp.end_date|default:"Present" }}</span>
+                </div>
+                <div class="entry-subtitle">{{ exp.company_name }}</div>
+                {% if exp.description %}
+                <div class="entry-description">{{ exp.description }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if resume.projects %}
+            <div class="section-title">Key Projects</div>
+            {% for proj in resume.projects %}
+            <div class="entry">
+                <div class="entry-header">
+                    <span class="entry-title">{{ proj.project_name }}</span>
+                    {% if proj.github_link %}
+                    <a href="{{ proj.github_link }}" class="link">View Source ↗</a>
+                    {% endif %}
+                </div>
+                {% if proj.description %}
+                <div class="entry-description">{{ proj.description }}</div>
+                {% endif %}
+                {% if proj.tech_stack %}
+                <div class="tech-stack">
+                    {% for tech in proj.tech_stack %}
+                    <span class="tech-tag">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

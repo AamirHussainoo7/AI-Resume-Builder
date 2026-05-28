@@ -29,6 +29,8 @@ class PDFService:
         'modern': 'pdf/modern.html',
         'classic': 'pdf/classic.html',
         'minimal': 'pdf/minimal.html',
+        'executive': 'pdf/executive.html',
+        'creative': 'pdf/creative.html',
     }
 
     @staticmethod

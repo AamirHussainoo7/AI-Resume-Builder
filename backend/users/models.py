@@ -12,12 +12,19 @@ class User(AbstractUser):
 
     name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, blank=True)
     profile_image = models.ImageField(
         upload_to='profile_images/',
         blank=True,
         null=True,
         help_text='User profile picture'
     )
+
+    # Premium subscription fields
+    is_premium = models.BooleanField(default=False)
+    premium_start_date = models.DateTimeField(null=True, blank=True)
+    premium_end_date = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Use email as the login field instead of username
